@@ -1,62 +1,43 @@
-name: Deploy Notebook to Databricks (by branch)
+name: Deploy Notebook to Databricks Dev
 
 on:
   push:
     branches:
       - dev
-      - qa
-      - main  # or 'prod' if that's your production branch name
 
 jobs:
-  deploy:
+  deploy-to-dev:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set environment variables based on branch
-      run: |
-        echo "GITHUB_REF is $GITHUB_REF"
-        BRANCH_NAME="${GITHUB_REF##*/}"
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-        if [[ "$BRANCH_NAME" == "dev" ]]; then
-          echo "ENV=dev" >> $GITHUB_ENV
-          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_DEV_HOST }}" >> $GITHUB_ENV
-          echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_DEV_TOKEN }}" >> $GITHUB_ENV
-        elif [[ "$BRANCH_NAME" == "qa" ]]; then
-          echo "ENV=qa" >> $GITHUB_ENV
-          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_QA_HOST }}" >> $GITHUB_ENV
-          echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_QA_TOKEN }}" >> $GITHUB_ENV
-        elif [[ "$BRANCH_NAME" == "main" ]]; then
-          echo "ENV=prod" >> $GITHUB_ENV
-          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_PROD_HOST }}" >> $GITHUB_ENV
-          echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_PROD_TOKEN }}" >> $GITHUB_ENV
-        else
-          echo "Unsupported branch $BRANCH_NAME"
-          exit 1
-        fi
+      - name: 🧰 Install Databricks CLI
+        run: pip install databricks-cli
 
-    - name: Install Databricks CLI
-      run: pip install databricks-cli
-
-    - name: Configure Databricks CLI
-      run: |
-        mkdir -p ~/.databricks
-        cat <<EOF > ~/.databricks/config
+      - name: 🔐 Configure Databricks CLI
+        run: |
+          mkdir -p ~/.databricks
+          cat <<EOF > ~/.databricks/config
 [DEFAULT]
-host = $DATABRICKS_HOST
-token = $DATABRICKS_TOKEN
+host = ${{ secrets.DATABRICKS_DEV_HOST }}
+token = ${{ secrets.DATABRICKS_DEV_TOKEN }}
 EOF
 
-    - name: Upload notebook to Databricks
-      run: |
-        echo "Uploading notebook for $ENV"
-        databricks workspace import \
-          notebooks/hello_world.py \
-          /Repos/CI-CD/hello_world_$ENV.py \
-          --language PYTHON \
-          --overwrite
+      - name: 🚀 Upload notebook to Databricks Dev
+        run: |
+          echo "Uploading notebooks/hello_world.py to /Repos/CI-CD/hello_world_dev.py"
+          databricks workspace import \
+            notebooks/hello_world.py \
+            /Repos/CI-CD/hello_world_dev.py \
+            --language PYTHON \
+            --overwrite
 
-    - name: ✅ Done
-      run: echo "Notebook deployed to $ENV environment!"
+      - name: ✅ Deployment complete
+        run: echo "Notebook successfully deployed to Databricks Dev!"
