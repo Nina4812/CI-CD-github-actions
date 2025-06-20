@@ -42,7 +42,7 @@ jobs:
 
       - name: 🚀 Upload hello.ipynb to Databricks QA
         run: |
-          echo "Uploading notebook/hello.ipynb to /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_qa"
+          echo "Uploading notebook/hello.ipynb to /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world"
           databricks workspace import \
             notebook/hello.ipynb \
             /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world \
