@@ -28,6 +28,16 @@ jobs:
           echo "host = ${{ secrets.DATABRICKS_DEV_HOST }}" >> ~/.databricks/config
           echo "token = ${{ secrets.DATABRICKS_DEV_TOKEN }}" >> ~/.databricks/config
 
+      - name: 🔍 Debug CLI Setup (Optional)
+        run: |
+          echo "User: $(whoami)"
+          echo "Home: $HOME"
+          ls -la ~/.databricks
+          cat ~/.databricks/config || echo "Missing config file"
+
+      - name: 🧪 Verify CLI Authentication
+        run: databricks workspace ls /
+
       - name: 🚀 Upload notebook to Databricks Dev
         run: |
           databricks workspace import \
