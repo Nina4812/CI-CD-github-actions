@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - qa
-    
 
 jobs:
   test-and-deploy:
@@ -23,7 +22,7 @@ jobs:
         run: |
           pip install databricks-cli pytest nbval pyspark
 
-      - name: 🧪 Run Notebook Test (nbval)
+      - name: 🧪 Run notebook test with nbval
         run: |
           pytest --nbval tests/test_dev_hello.ipynb
 
@@ -36,8 +35,14 @@ jobs:
         env:
           DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
 
+      - name: 🪵 Show CLI config for debugging
+        run: cat .databricks/config
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
+
       - name: 🚀 Upload notebook to Databricks QA
         run: |
+          echo "Uploading notebook/hello.ipynb to /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_qa"
           databricks workspace import \
             notebook/hello.ipynb \
             /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_qa \
