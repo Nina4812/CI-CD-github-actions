@@ -40,7 +40,7 @@ jobs:
         env:
           DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
 
-      - name: 🚀 Upload notebook to Databricks QA
+      - name: 🚀 Upload hello.ipynb to Databricks QA
         run: |
           echo "Uploading notebook/hello.ipynb to /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_qa"
           databricks workspace import \
