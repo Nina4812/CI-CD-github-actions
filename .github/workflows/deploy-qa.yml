@@ -25,7 +25,9 @@ jobs:
           pip install databricks-cli pytest pyspark
 
       - name: 🧪 Run Tests
-        run: pytest tests/
+        run: 
+          pip install pytest nbval
+          pytest --nbval tests/test_dev_hello.ipynb
 
       - name: 🔐 Configure Databricks CLI
         run: |
