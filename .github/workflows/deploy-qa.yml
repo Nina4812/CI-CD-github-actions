@@ -23,24 +23,26 @@ jobs:
           pip install databricks-cli pytest nbval pyspark
 
       - name: 🧪 Run notebook test with nbval
-        run: |
-          pytest --nbval tests/test_dev_hello.ipynb
+        run: pytest --nbval tests/test_dev_hello.ipynb
 
       - name: 🔐 Configure Databricks CLI
         run: |
-          mkdir -p ~/.databricks
-          echo "[DEFAULT]" > ~/.databricks/config
-          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databricks/config
-          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databricks/config
+          mkdir -p .databricks
+          echo "[DEFAULT]" > .databricks/config
+          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> .databricks/config
+          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> .databricks/config
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
 
-      - name: 🪵 Confirm CLI config exists
-        run: |
-          echo "::group::CLI Config Content"
-          cat ~/.databricks/config || echo "❌ Config not found!"
-          echo "::endgroup::"
+      - name: 🪵 Show config contents
+        run: cat .databricks/config
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
 
-      - name: 🧪 Test CLI access (workspace ls)
+      - name: 🧪 Test CLI access
         run: databricks workspace ls /
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
 
       - name: 🚀 Upload notebook to Databricks QA
         run: |
@@ -51,3 +53,5 @@ jobs:
             --language PYTHON \
             --format SOURCE \
             --overwrite
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
