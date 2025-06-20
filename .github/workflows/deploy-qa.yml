@@ -33,19 +33,14 @@ jobs:
           echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databricks/config
           echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databricks/config
 
-      - name: 🪵 Debug Check secret values (sanitized)
+      - name: 🪵 Confirm CLI config exists
         run: |
-          echo "::notice ::Host starts with: ${DATABRICKS_HOST:0:8}..."
-          echo "::notice ::Token length: ${#DATABRICKS_TOKEN}"
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-
-      - name: 🪵 Debug Show CLI config
-        run: |
-          echo "::group::Databricks CLI Config"
-          cat ~/.databricks/config
+          echo "::group::CLI Config Content"
+          cat ~/.databricks/config || echo "❌ Config not found!"
           echo "::endgroup::"
+
+      - name: 🧪 Test CLI access (workspace ls)
+        run: databricks workspace ls /
 
       - name: 🚀 Upload notebook to Databricks QA
         run: |
