@@ -1,0 +1,44 @@
+name: Test and Deploy to Databricks QA
+
+on:
+  push:
+    branches:
+      - qa
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: 🧰 Install dependencies
+        run: |
+          pip install databricks-cli pytest pyspark
+
+      - name: 🧪 Run Tests
+        run: pytest tests/
+
+      - name: 🔐 Configure Databricks CLI
+        run: |
+          mkdir -p ./.databricks
+          echo "[DEFAULT]" > ./.databricks/config
+          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ./.databricks/config
+          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ./.databricks/config
+
+      - name: 🚀 Upload notebook to Databricks QA
+        run: |
+          databricks workspace import \
+            notebook/hello.ipynb \
+            /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_qa \
+            --language PYTHON \
+            --format SOURCE \
+            --overwrite
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
