@@ -1,4 +1,4 @@
-name: Deploy Notebook to Databricks Dev
+name: Deploy to Databricks Dev
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - dev
 
 jobs:
-  deploy-to-dev:
+  deploy-dev:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +22,6 @@ jobs:
         run: pip install databricks-cli
 
       - name: 🔐 Configure Databricks CLI
-        shell: bash
         run: |
           mkdir -p ~/.databricks
           echo "[DEFAULT]" > ~/.databricks/config
@@ -31,13 +30,9 @@ jobs:
 
       - name: 🚀 Upload notebook to Databricks Dev
         run: |
-          echo "Uploading notebook/hello.ipynb to /Repos/CI-CD/hello_world_dev"
           databricks workspace import \
-            notebook/hello.ipynb \
-            /Repos/CI-CD/hello_world_dev \
+            notebooks/hello_world.py \
+            /Repos/CI-CD/dev/hello_world.py \
             --language PYTHON \
             --format SOURCE \
             --overwrite
-
-      - name: ✅ Deployment complete
-        run: echo "Notebook successfully deployed to Databricks Dev!"
