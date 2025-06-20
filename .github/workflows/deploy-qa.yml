@@ -28,12 +28,10 @@ jobs:
 
       - name: 🔐 Configure Databricks CLI
         run: |
-          mkdir -p ./.databricks
-          echo "[DEFAULT]" > ./.databricks/config
-          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ./.databricks/config
-          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ./.databricks/config
-        env:
-          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
+          mkdir -p ~/.databricks
+          echo "[DEFAULT]" > ~/.databricks/config
+          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databricks/config
+          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databricks/config
 
       - name: 🪵 Debug Check secret values (sanitized)
         run: |
@@ -43,10 +41,10 @@ jobs:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
-      - name: 🪵 Debug Show config file
+      - name: 🪵 Debug Show CLI config
         run: |
           echo "::group::Databricks CLI Config"
-          cat .databricks/config
+          cat ~/.databricks/config
           echo "::endgroup::"
 
       - name: 🚀 Upload notebook to Databricks QA
@@ -58,5 +56,3 @@ jobs:
             --language PYTHON \
             --format SOURCE \
             --overwrite
-        env:
-          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
