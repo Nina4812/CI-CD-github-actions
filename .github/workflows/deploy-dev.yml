@@ -22,22 +22,19 @@ jobs:
         run: pip install databricks-cli
 
       - name: 🔐 Configure Databricks CLI
-        shell: bash
         run: |
-          mkdir -p ~/.databricks
-          echo "[DEFAULT]" > ~/.databricks/config
-          echo "host = ${{ secrets.DATABRICKS_DEV_HOST }}" >> ~/.databricks/config
-          echo "token = ${{ secrets.DATABRICKS_DEV_TOKEN }}" >> ~/.databricks/config
+          mkdir -p ./.databricks
+          echo "[DEFAULT]" > ./.databricks/config
+          echo "host = ${{ secrets.DATABRICKS_DEV_HOST }}" >> ./.databricks/config
+          echo "token = ${{ secrets.DATABRICKS_DEV_TOKEN }}" >> ./.databricks/config
 
       - name: 🚀 Upload notebook to Databricks Dev
         run: |
-          echo "Uploading notebook/hello.ipynb to /Repos/CI-CD/hello_world_dev"
           databricks workspace import \
             notebook/hello.ipynb \
-            /Repos/CI-CD/hello_world_dev \
+            /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_dev \
             --language PYTHON \
             --format SOURCE \
             --overwrite
-
-      - name: ✅ Deployment complete
-        run: echo "Notebook successfully deployed to Databricks Dev!"
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
