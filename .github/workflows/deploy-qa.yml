@@ -35,17 +35,26 @@ jobs:
         env:
           DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
 
-      - name: 🪵 Show CLI config for debugging
-        run: cat .databricks/config
-        env:
-          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
-
-      - name: 🚀 Upload hello.ipynb to Databricks QA
+      - name: 🪵 Debug: Check secret values (sanitized)
         run: |
-          echo "Uploading notebook/hello.ipynb to /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world"
+          echo "::notice ::Host starts with: ${DATABRICKS_HOST:0:8}..."
+          echo "::notice ::Token length: ${#DATABRICKS_TOKEN}"
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+      - name: 🪵 Debug: Show config file
+        run: |
+          echo "::group::Databricks CLI Config"
+          cat .databricks/config
+          echo "::endgroup::"
+
+      - name: 🚀 Upload notebook to Databricks QA
+        run: |
+          echo "Uploading notebook/hello.ipynb to /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_qa"
           databricks workspace import \
             notebook/hello.ipynb \
-            /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world \
+            /Users/sunainag4444@gmail.com/CI-CD-github-actions/hello_world_qa \
             --language PYTHON \
             --format SOURCE \
             --overwrite
