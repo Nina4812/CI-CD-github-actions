@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - qa
-      
 
 jobs:
   test-and-deploy:
@@ -18,15 +17,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-          
 
       - name: 🧰 Install dependencies
         run: |
-          pip install databricks-cli pytest pyspark
+          pip install databricks-cli pytest nbval pyspark
 
-      - name: 🧪 Run Tests
-        run: 
-          pip install pytest nbval
+      - name: 🧪 Run Notebook Test (nbval)
+        run: |
           pytest --nbval tests/test_dev_hello.ipynb
 
       - name: 🔐 Configure Databricks CLI
@@ -35,6 +32,8 @@ jobs:
           echo "[DEFAULT]" > ./.databricks/config
           echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ./.databricks/config
           echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ./.databricks/config
+        env:
+          DATABRICKS_CONFIG_FILE: ${{ github.workspace }}/.databricks/config
 
       - name: 🚀 Upload notebook to Databricks QA
         run: |
